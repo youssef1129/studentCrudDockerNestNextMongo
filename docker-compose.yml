@@ -1,0 +1,47 @@
+version: '3.7'
+services:
+  
+  mongo_db:
+    container_name: mongo_db
+    image: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${DB_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASSWORD}
+      MONGO_INITDB_DATABASE: ${DB_NAME}
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb_data_container:/data/db
+
+  nest_server:
+    container_name: nest_server
+    build:  
+      context: ./server/
+    env_file:
+      - .env
+    ports: 
+        - ${APP_PORT}:${APP_PORT}
+    depends_on:
+      - mongo_db
+    links:
+      - mongo_db
+  
+  client:
+      container_name: client
+      environment:
+        SERVER_URI: ${SERVER_URI}
+      build: 
+        context: ./client/
+        args:
+         SERVER_URI: ${SERVER_URI}
+      env_file:
+      - .env
+      ports:
+        - 6002:3000
+      depends_on:
+        - nest_server
+        - mongo_db
+
+volumes:
+  mongodb_data_container:
+  
