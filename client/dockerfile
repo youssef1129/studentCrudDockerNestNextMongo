@@ -5,5 +5,7 @@ WORKDIR /next/app
 COPY package.json .
 RUN npm i
 COPY . .
+ARG SERVER_URI=http://localhost:6001/
+ENV SERVER_URI=$SERVER_URI
 RUN npm run build
 CMD ["npm","start"]
